@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:baselineAligned="false"
+    android:divider="?android:attr/dividerHorizontal"
+    android:orientation="horizontal"
+    android:showDividers="middle"
+    tools:context="com.pamobo0609.EarthquakeListActivity">
+
+    <!--
+    This layout is a two-pane layout for the Earthquakes
+    master/detail flow.
+
+    -->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/earthquake_list"
+        android:name="com.pamobo0609.EarthquakeListFragment"
+        android:layout_width="325dp"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context="com.pamobo0609.EarthquakeListActivity"
+        tools:listitem="@layout/earthquake_list_content" />
+
+    <FrameLayout
+        android:id="@+id/earthquake_detail_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3" />
+
+</LinearLayout>

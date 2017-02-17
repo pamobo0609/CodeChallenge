@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Code challenge</string>
+    <string name="title_earthquake_detail">Earthquake Detail</string>
+    <string name="err_connection">There was a problem making the request. Check your internet connection.</string>
+</resources>
