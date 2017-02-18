@@ -1,5 +1,7 @@
 package com.pamobo0609;
 
+import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -10,8 +12,12 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +27,7 @@ import com.pamobo0609.manager.RetrofitManager;
 import com.pamobo0609.model.EarthquakeModel;
 import com.pamobo0609.model.Feature;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -39,7 +46,13 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
      */
     private boolean mTwoPane;
 
-     ActivityEarthquakeListBinding mBinding;
+    ActivityEarthquakeListBinding mBinding;
+
+    private ProgressDialog progressDialog;
+
+    private String startDate;
+
+    private String endDate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +70,46 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
             mTwoPane = true;
         }
 
-        if (isConnected()) {
-            RetrofitManager.getInstance().getEarthquakes(CodeChallengeConstants.QUERY_FORMAT, "2014-01-01", "2014-01-02",
-                    this);
-        } else {
+        final DatePickerDialog.OnDateSetListener startDateListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                startDate = year+"-"+month+"-"+day;
 
-        }
+            }
+        };
 
+        final DatePickerDialog.OnDateSetListener endDateListener = new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                endDate = year+"-"+month+"-"+day;
+            }
+        };
+
+        /*final LinearLayout llStartTime = (LinearLayout) findViewById(R.id.ll_start_time);
+        llStartTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(EarthquakeListActivity.this, startDateListener, Calendar.YEAR,
+                        Calendar.MONTH, Calendar.DAY_OF_MONTH);
+            }
+        });
+
+        final LinearLayout llEndTime = (LinearLayout) findViewById(R.id.ll_end_time);
+        llEndTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new DatePickerDialog(EarthquakeListActivity.this, endDateListener, Calendar.YEAR,
+                        Calendar.MONTH, Calendar.DAY_OF_MONTH);
+            }
+        });*/
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.date_pickers, menu);
+        return true;
     }
 
     private boolean isConnected() {
@@ -79,6 +125,9 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
 
     @Override
     public void onSuccess(EarthquakeModel pModel) {
+        if (null != progressDialog && !isFinishing()) {
+            progressDialog.dismiss();
+        }
         assert mBinding.listInclude.earthquakeList != null;
         setupRecyclerView(mBinding.listInclude.earthquakeList, pModel.getFeatures());
     }
@@ -93,7 +142,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
 
         private final List<Feature> mDataSet;
 
-        public SimpleItemRecyclerViewAdapter(List<Feature> pDataSet) {
+        SimpleItemRecyclerViewAdapter(List<Feature> pDataSet) {
             mDataSet = pDataSet;
         }
 

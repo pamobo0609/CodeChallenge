@@ -2,4 +2,8 @@
     <string name="app_name">Code challenge</string>
     <string name="title_earthquake_detail">Earthquake Detail</string>
     <string name="err_connection">There was a problem making the request. Check your internet connection.</string>
+    <string name="msg_loading">Loading earthquakes...</string>
+    <string name="msg_end_time">End time</string>
+    <string name="msg_start_time">Start time</string>
+    <string name="msg_instructions">Please set a date range to search for.</string>
 </resources>
