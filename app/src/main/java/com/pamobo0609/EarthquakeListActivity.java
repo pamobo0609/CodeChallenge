@@ -1,5 +1,6 @@
 package com.pamobo0609;
 
+import android.animation.Animator;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -14,19 +15,25 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.DatePicker;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pamobo0609.constants.CodeChallengeConstants;
 import com.pamobo0609.databinding.ActivityEarthquakeListBinding;
+import com.pamobo0609.datasource.EarthquakeDataSource;
 import com.pamobo0609.manager.RetrofitManager;
 import com.pamobo0609.model.EarthquakeModel;
 import com.pamobo0609.model.Feature;
+import com.pamobo0609.service.DatabaseService;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -70,39 +77,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
             mTwoPane = true;
         }
 
-        final DatePickerDialog.OnDateSetListener startDateListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                startDate = year+"-"+month+"-"+day;
-
-            }
-        };
-
-        final DatePickerDialog.OnDateSetListener endDateListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                endDate = year+"-"+month+"-"+day;
-            }
-        };
-
-        /*final LinearLayout llStartTime = (LinearLayout) findViewById(R.id.ll_start_time);
-        llStartTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DatePickerDialog(EarthquakeListActivity.this, startDateListener, Calendar.YEAR,
-                        Calendar.MONTH, Calendar.DAY_OF_MONTH);
-            }
-        });
-
-        final LinearLayout llEndTime = (LinearLayout) findViewById(R.id.ll_end_time);
-        llEndTime.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                new DatePickerDialog(EarthquakeListActivity.this, endDateListener, Calendar.YEAR,
-                        Calendar.MONTH, Calendar.DAY_OF_MONTH);
-            }
-        });*/
-
+        // Render the rows from the service or from the database
+        showOfflineRowsIfApplicable();
     }
 
     @Override
@@ -110,6 +86,88 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.date_pickers, menu);
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_start_time:
+                final DatePickerDialog.OnDateSetListener startDateListener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        startDate = year + "-" + month + "-" + day;
+                    }
+                };
+
+                new DatePickerDialog(this, startDateListener, 2016, Calendar.MONTH, Calendar.DAY_OF_MONTH).show();
+
+                break;
+            case R.id.action_end_time:
+                final DatePickerDialog.OnDateSetListener endDateListener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                        endDate = year + "-" + month + "-" + day;
+                        if (null != startDate && !startDate.trim().isEmpty() && null != endDate && !endDate.trim().isEmpty()) {
+                            progressDialog = new ProgressDialog(EarthquakeListActivity.this);
+                            progressDialog.setMessage(getString(R.string.msg_loading));
+                            progressDialog.show();
+
+                            RetrofitManager.getInstance().getEarthquakes(CodeChallengeConstants.QUERY_FORMAT,
+                                    startDate, endDate, EarthquakeListActivity.this);
+                        }
+                    }
+                };
+
+                new DatePickerDialog(this, endDateListener, 2016, Calendar.MONTH, Calendar.DAY_OF_MONTH).show();
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSuccess(EarthquakeModel pModel) {
+        if (null != progressDialog && !isFinishing()) {
+            progressDialog.dismiss();
+        }
+
+        if (pModel.getFeatures().isEmpty()) {
+            Toast.makeText(this, R.string.msg_no_quakes, Toast.LENGTH_SHORT).show();
+        } else {
+            assert mBinding.listInclude.earthquakeList != null;
+            setupRecyclerView(mBinding.listInclude.earthquakeList, pModel.getFeatures());
+
+            // Once a search has been made, we save the last search
+            Intent serviceIntent = new Intent(this, DatabaseService.class);
+            serviceIntent.putExtra(CodeChallengeConstants.EARTHQUAKES_KEY, pModel);
+            startService(serviceIntent);
+        }
+    }
+
+    @Override
+    public void onFailure() {
+        if (null != progressDialog && !isFinishing()) {
+            progressDialog.dismiss();
+        }
+
+        Toast.makeText(this, R.string.err_connection, Toast.LENGTH_SHORT).show();
+    }
+
+    private void showOfflineRowsIfApplicable() {
+        if (!isConnected()) {
+            if (EarthquakeDataSource.databaseExists()) {
+                EarthquakeDataSource dataSource = new EarthquakeDataSource(this);
+                dataSource.open();
+
+                setupRecyclerView(mBinding.listInclude.earthquakeList, dataSource.getEarthquakes()
+                        .getFeatures());
+
+                dataSource.close();
+                Toast.makeText(this, R.string.msg_showing_offline, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, R.string.err_no_offline, Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private boolean isConnected() {
@@ -121,20 +179,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<Feature> pDataSet) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(pDataSet));
-    }
-
-    @Override
-    public void onSuccess(EarthquakeModel pModel) {
-        if (null != progressDialog && !isFinishing()) {
-            progressDialog.dismiss();
-        }
-        assert mBinding.listInclude.earthquakeList != null;
-        setupRecyclerView(mBinding.listInclude.earthquakeList, pModel.getFeatures());
-    }
-
-    @Override
-    public void onFailure() {
-        Toast.makeText(this, R.string.err_connection, Toast.LENGTH_SHORT).show();
+        mBinding.listInclude.earthquakeList.setVisibility(View.VISIBLE);
+        mBinding.listInclude.txtvInstructions.setVisibility(View.GONE);
     }
 
     public class SimpleItemRecyclerViewAdapter
@@ -150,17 +196,24 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.earthquake_list_content, parent, false);
+
+            Animation animation = AnimationUtils.loadAnimation(EarthquakeListActivity.this, R.anim.push_left_in);
+            animation.setDuration(500);
+            view.startAnimation(animation);
+
             return new ViewHolder(view);
         }
+
+
 
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mDataSet.get(position);
 
-            holder.txtvLat.setText(String.valueOf(holder.mItem .getGeometry().getCoordinates().get(0)));
-            holder.txtvLong.setText(String.valueOf(holder.mItem .getGeometry().getCoordinates().get(1)));
-            holder.txtvMagnitude.setText(String.valueOf(holder.mItem .getProperties().getMag()));
-            holder.txtvPlace.setText(holder.mItem .getProperties().getPlace());
+            holder.txtvLat.setText(String.valueOf(holder.mItem.getGeometry().getCoordinates().get(0)));
+            holder.txtvLong.setText(String.valueOf(holder.mItem.getGeometry().getCoordinates().get(1)));
+            holder.txtvMagnitude.setText(String.valueOf(holder.mItem.getProperties().getMag()));
+            holder.txtvPlace.setText(holder.mItem.getProperties().getPlace());
 
             holder.mView.setOnClickListener(new View.OnClickListener() {
                 @Override
