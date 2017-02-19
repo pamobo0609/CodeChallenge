@@ -1,6 +1,5 @@
 package com.pamobo0609;
 
-import android.animation.Animator;
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -32,8 +31,6 @@ import com.pamobo0609.model.EarthquakeModel;
 import com.pamobo0609.model.Feature;
 import com.pamobo0609.service.DatabaseService;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -70,10 +67,7 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         mBinding.toolbar.setTitle(getTitle());
 
         if (findViewById(R.id.earthquake_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
+            // When this pane is present, it means that is a tablet.
             mTwoPane = true;
         }
 
@@ -88,9 +82,17 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         return true;
     }
 
+    /**
+     * <h1>onOptionsItemSelected</h1>
+     * <p>Handles the click on every option from the menu in the {@link android.support.v7.widget.Toolbar}</p>
+     *
+     * @param item the clicked {@link MenuItem}
+     * @return boolean click state
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            // Click listener for the start time for the date range
             case R.id.action_start_time:
                 final DatePickerDialog.OnDateSetListener startDateListener = new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -99,9 +101,12 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
                     }
                 };
 
-                new DatePickerDialog(this, startDateListener, 2016, Calendar.MONTH, Calendar.DAY_OF_MONTH).show();
+                new DatePickerDialog(this, startDateListener, Calendar.YEAR+(2017-Calendar.YEAR),
+                        Calendar.MONTH, Calendar.DAY_OF_MONTH).show();
 
                 break;
+
+            // Click listener for the end time for the date range
             case R.id.action_end_time:
                 final DatePickerDialog.OnDateSetListener endDateListener = new DatePickerDialog.OnDateSetListener() {
                     @Override
@@ -118,22 +123,32 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
                     }
                 };
 
-                new DatePickerDialog(this, endDateListener, 2016, Calendar.MONTH, Calendar.DAY_OF_MONTH).show();
+                new DatePickerDialog(this, endDateListener, Calendar.YEAR+(2017-Calendar.YEAR),
+                        Calendar.MONTH, Calendar.DAY_OF_MONTH).show();
 
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * <h1>onSuccess</h1>
+     * <p>Method called when the request is successful.</p>
+     *
+     * @param pModel the earthquakes
+     */
     @Override
     public void onSuccess(EarthquakeModel pModel) {
+        // Dismiss the progress dialog.
         if (null != progressDialog && !isFinishing()) {
             progressDialog.dismiss();
         }
 
+        // If there's no earthquakes, a message is shown
         if (pModel.getFeatures().isEmpty()) {
             Toast.makeText(this, R.string.msg_no_quakes, Toast.LENGTH_SHORT).show();
         } else {
+            // In this case, there IS earthquakes
             assert mBinding.listInclude.earthquakeList != null;
             setupRecyclerView(mBinding.listInclude.earthquakeList, pModel.getFeatures());
 
@@ -144,6 +159,10 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         }
     }
 
+    /**
+     * <h1>onFailure</h1>
+     * <p>Called when the web service is not available, or something happened with the request.</p>
+     */
     @Override
     public void onFailure() {
         if (null != progressDialog && !isFinishing()) {
@@ -153,7 +172,12 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         Toast.makeText(this, R.string.err_connection, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * <h1>showOfflineRowsIfApplicable</h1>
+     * <p>Shows the offline data, saved in a SQLite database.</p>
+     */
     private void showOfflineRowsIfApplicable() {
+        // We check if there's internet connection
         if (!isConnected()) {
             if (EarthquakeDataSource.databaseExists()) {
                 EarthquakeDataSource dataSource = new EarthquakeDataSource(this);
@@ -170,6 +194,12 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         }
     }
 
+    /**
+     * <h1>isConnected</h1>
+     * <p>Checks the current network state.</p>
+     *
+     * @return a boolean saying if there's internet or not
+     */
     private boolean isConnected() {
         ConnectivityManager connectivityManager
                 = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -177,21 +207,49 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    /**
+     * <h1>setupRecyclerView</h1>
+     * <p>Initializes the {@link RecyclerView}</p>
+     *
+     * @param recyclerView the {@link RecyclerView} that shows the earthquakes.
+     * @param pDataSet     where the earthquakes are.
+     */
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, List<Feature> pDataSet) {
         recyclerView.setAdapter(new SimpleItemRecyclerViewAdapter(pDataSet));
         mBinding.listInclude.earthquakeList.setVisibility(View.VISIBLE);
         mBinding.listInclude.txtvInstructions.setVisibility(View.GONE);
     }
 
+    /**
+     * <h1>SimpleItemRecyclerViewAdapter</h1>
+     * <p>Adapter class for the RecyclerView.</p>
+     */
     public class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
+        /**
+         * Where all the data is.
+         */
         private final List<Feature> mDataSet;
 
+        /**
+         * <h1>SimpleItemRecyclerViewAdapter</h1>
+         * <p>Constructor for the adapter.</p>
+         *
+         * @param pDataSet the data
+         */
         SimpleItemRecyclerViewAdapter(List<Feature> pDataSet) {
             mDataSet = pDataSet;
         }
 
+        /**
+         * <h1>onCreateViewHolder</h1>
+         * <p>Inflates the row, and adds the slide animation.</p>
+         *
+         * @param parent   the root view of where the {@link RecyclerView} is
+         * @param viewType row type.
+         * @return a {@link android.support.v7.widget.RecyclerView.ViewHolder}
+         */
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext())
@@ -204,14 +262,19 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
             return new ViewHolder(view);
         }
 
-
-
+        /**
+         * <h1>onBindViewHolder</h1>
+         * <p>Adds the data to every row.</p>
+         *
+         * @param holder   the {@link android.support.v7.widget.RecyclerView.ViewHolder} instance
+         * @param position position for the dataset.
+         */
         @Override
         public void onBindViewHolder(final ViewHolder holder, int position) {
             holder.mItem = mDataSet.get(position);
 
-            holder.txtvLat.setText(String.valueOf(holder.mItem.getGeometry().getCoordinates().get(0)));
-            holder.txtvLong.setText(String.valueOf(holder.mItem.getGeometry().getCoordinates().get(1)));
+            holder.txtvLat.setText(String.valueOf(holder.mItem.getGeometry().getCoordinates().get(1)));
+            holder.txtvLong.setText(String.valueOf(holder.mItem.getGeometry().getCoordinates().get(0)));
             holder.txtvMagnitude.setText(String.valueOf(holder.mItem.getProperties().getMag()));
             holder.txtvPlace.setText(holder.mItem.getProperties().getPlace());
 
@@ -229,8 +292,8 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
                     } else {
                         Context context = v.getContext();
                         Intent intent = new Intent(context, EarthquakeDetailActivity.class);
-                        intent.putExtra(CodeChallengeConstants.LAT_KEY, holder.mItem.getGeometry().getCoordinates().get(0));
-                        intent.putExtra(CodeChallengeConstants.LONG_KEY, holder.mItem.getGeometry().getCoordinates().get(1));
+                        intent.putExtra(CodeChallengeConstants.LAT_KEY, holder.mItem.getGeometry().getCoordinates().get(1));
+                        intent.putExtra(CodeChallengeConstants.LONG_KEY, holder.mItem.getGeometry().getCoordinates().get(0));
 
                         context.startActivity(intent);
                     }
@@ -238,11 +301,21 @@ public class EarthquakeListActivity extends AppCompatActivity implements Retrofi
             });
         }
 
+        /**
+         * <h1>getItemCount</h1>
+         * <p>Returns the row count.</p>
+         *
+         * @return the row count
+         */
         @Override
         public int getItemCount() {
             return mDataSet.size();
         }
 
+        /**
+         * <h1>ViewHolder</h1>
+         * <p>A reflection of the row, to add it to cache.</p>
+         */
         public class ViewHolder extends RecyclerView.ViewHolder {
             public final View mView;
             public final TextView txtvPlace;

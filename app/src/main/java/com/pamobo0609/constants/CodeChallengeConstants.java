@@ -5,6 +5,9 @@ package com.pamobo0609.constants;
  */
 
 public interface CodeChallengeConstants {
+    /**
+     * Base url for the request
+     */
     String BASE_URL = "http://earthquake.usgs.gov/fdsnws/event/1/";
 
     String QUERY_FORMAT = "geojson";
@@ -18,7 +21,9 @@ public interface CodeChallengeConstants {
 
     String EARTHQUAKES_KEY = "earthquakes";
 
-
+    /**
+     * Database constants.
+     */
     String TABLE_NAME = "Earthquakes";
 
     String COLUMN_ID = "id";

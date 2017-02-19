@@ -28,7 +28,7 @@ import com.pamobo0609.databinding.ActivityEarthquakeDetailBinding;
  */
 public class EarthquakeDetailActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private GoogleMap mMap;
+    GoogleMap mMap;
 
     ActivityEarthquakeDetailBinding mBinding;
 
@@ -57,15 +57,7 @@ public class EarthquakeDetailActivity extends AppCompatActivity implements OnMap
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        // savedInstanceState is non-null when there is fragment state
-        // saved from previous configurations of this activity
-        // (e.g. when rotating the screen from portrait to landscape).
-        // In this case, the fragment will automatically be re-added
-        // to its container so we don't need to manually add it.
-        // For more information, see the Fragments API guide at:
-        //
-        // http://developer.android.com/guide/components/fragments.html
-        //
+        // When the savedInstanceState is null, it means that a fragment is being used.
         if (savedInstanceState == null) {
             // Create the detail fragment and add it to the activity
             // using a fragment transaction.
@@ -85,18 +77,18 @@ public class EarthquakeDetailActivity extends AppCompatActivity implements OnMap
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            // This ID represents the Home or Up button. In the case of this
-            // activity, the Up button is shown. For
-            // more details, see the Navigation pattern on Android Design:
-            //
-            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
-            //
             navigateUpTo(new Intent(this, EarthquakeListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * <h1>OnMapReady</h1>
+     * <p>Executed when the {@link GoogleMap} is ready.</p>
+     *
+     * @param googleMap the {@link GoogleMap} in the fragment.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;

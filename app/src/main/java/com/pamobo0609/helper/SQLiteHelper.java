@@ -12,15 +12,29 @@ import com.pamobo0609.constants.CodeChallengeConstants;
 
 public class SQLiteHelper extends SQLiteOpenHelper {
 
+    /**
+     * Script for the database initialization
+     */
     private static final String DATABASE_INIT = "create table "+CodeChallengeConstants.TABLE_NAME+"(id integer primary key autoincrement," +
             CodeChallengeConstants.COLUMN_PLACE+" text not null, "+CodeChallengeConstants.COLUMN_MAGNITUDE
             +" numeric not null, "+CodeChallengeConstants.COLUMN_LAT+" numeric not null, "+CodeChallengeConstants.COLUMN_LONG+" numeric not null);";
 
-
+    /**
+     * <h1>SQLiteHelper</h1>
+     * <p>Constructor for the SQLiteHelper class.</p>
+     *
+     * @param context the related {@link Context}
+     */
     public SQLiteHelper(Context context) {
         super(context, CodeChallengeConstants.DATABASE_NAME, null, CodeChallengeConstants.DATABASE_VERSION);
     }
 
+    /**
+     * <h1>OnCreate</h1>
+     * <p>Called when we create the database.</p>
+     *
+     * @param sqLiteDatabase the created database
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(DATABASE_INIT);

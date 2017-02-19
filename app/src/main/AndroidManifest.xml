@@ -38,8 +38,9 @@
                 android:value="com.pamobo0609.EarthquakeListActivity" />
         </activity>
 
-        <service android:name=".service.DatabaseService"
-            android:exported="false"/>
+        <service
+            android:name=".service.DatabaseService"
+            android:exported="false" />
 
     </application>
 

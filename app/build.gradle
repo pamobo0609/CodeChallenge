@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
+
     dataBinding {
         enabled = true
     }
@@ -9,6 +10,7 @@ android {
     buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "com.pamobo0609"
+        multiDexEnabled true
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -29,6 +31,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
+    compile 'com.android.support:multidex:1.0.1'
 
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support:support-v4:25.1.1'

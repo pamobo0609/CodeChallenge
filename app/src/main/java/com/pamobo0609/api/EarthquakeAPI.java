@@ -11,6 +11,14 @@ import retrofit2.http.Query;
  */
 
 public interface EarthquakeAPI {
+    /**
+     * <h1>GetEarthquakes</h1>
+     * <p>API method to get the {@link EarthquakeModel} that contains all earthquakes.</p>
+     * @param format the format for the request response
+     * @param startTime the start date for the date range
+     * @param endTime the end date for the date range
+     * @return a {@link Call<EarthquakeModel>} object
+     */
     @GET("query")
     Call<EarthquakeModel> getEarthquakes(@Query("format") String format,
                                     @Query("starttime") String startTime, @Query("endtime") String endTime);

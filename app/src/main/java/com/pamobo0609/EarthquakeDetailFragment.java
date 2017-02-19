@@ -28,10 +28,6 @@ public class EarthquakeDetailFragment extends Fragment implements OnMapReadyCall
 
     private MapView mapView;
 
-    /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
-     */
     public EarthquakeDetailFragment() {
     }
 
@@ -81,6 +77,12 @@ public class EarthquakeDetailFragment extends Fragment implements OnMapReadyCall
         mapView.onDestroy();
     }
 
+    /**
+     * <h1>OnMapReady</h1>
+     * <p>Executed when the {@link GoogleMap} is ready.</p>
+     *
+     * @param googleMap the {@link GoogleMap} in the fragment.
+     */
     @Override
     public void onMapReady(GoogleMap googleMap) {
         LatLng coordinates = new LatLng(mLatitude, mLongitude);
