@@ -9,7 +9,7 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="com.pamobo0609.EarthquakeListActivity">
+    tools:context="com.pamobo0609.view.activity.EarthquakeListActivity">
 
     <!--
     This layout is a two-pane layout for the Earthquakes
@@ -27,7 +27,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context="com.pamobo0609.EarthquakeListActivity"
+        tools:context="com.pamobo0609.view.activity.EarthquakeListActivity"
         tools:listitem="@layout/earthquake_list_content" />
 
     <FrameLayout

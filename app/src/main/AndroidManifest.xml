@@ -19,7 +19,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".EarthquakeListActivity"
+            android:name=".view.activity.EarthquakeListActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -29,13 +29,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".EarthquakeDetailActivity"
+            android:name=".view.activity.EarthquakeDetailActivity"
             android:label="@string/title_earthquake_detail"
-            android:parentActivityName=".EarthquakeListActivity"
+            android:parentActivityName=".view.activity.EarthquakeListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.pamobo0609.EarthquakeListActivity" />
+                android:value="com.pamobo0609.view.activity.EarthquakeListActivity" />
         </activity>
 
         <service

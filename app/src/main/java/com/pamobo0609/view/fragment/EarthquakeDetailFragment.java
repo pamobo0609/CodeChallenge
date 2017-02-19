@@ -1,4 +1,4 @@
-package com.pamobo0609;
+package com.pamobo0609.view.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +12,10 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.pamobo0609.R;
 import com.pamobo0609.constants.CodeChallengeConstants;
+import com.pamobo0609.view.activity.EarthquakeDetailActivity;
+import com.pamobo0609.view.activity.EarthquakeListActivity;
 
 /**
  * A fragment representing a single Earthquake detail screen.

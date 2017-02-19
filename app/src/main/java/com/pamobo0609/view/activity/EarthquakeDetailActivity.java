@@ -1,12 +1,8 @@
-package com.pamobo0609;
+package com.pamobo0609.view.activity;
 
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.ActionBar;
 import android.view.MenuItem;
@@ -17,8 +13,10 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.pamobo0609.R;
 import com.pamobo0609.constants.CodeChallengeConstants;
 import com.pamobo0609.databinding.ActivityEarthquakeDetailBinding;
+import com.pamobo0609.view.fragment.EarthquakeDetailFragment;
 
 /**
  * An activity representing a single Earthquake detail screen. This

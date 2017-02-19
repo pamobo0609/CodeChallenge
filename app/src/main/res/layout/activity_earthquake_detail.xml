@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="true"
-        tools:context="com.pamobo0609.EarthquakeDetailActivity"
+        tools:context="com.pamobo0609.view.activity.EarthquakeDetailActivity"
         tools:ignore="MergeRootFrame">
 
         <android.support.v4.widget.NestedScrollView
@@ -20,7 +20,7 @@
             android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context="com.pamobo0609.EarthquakeDetailActivity" />
+            tools:context="com.pamobo0609.view.activity.EarthquakeDetailActivity" />
 
     </android.support.design.widget.CoordinatorLayout>
 </layout>

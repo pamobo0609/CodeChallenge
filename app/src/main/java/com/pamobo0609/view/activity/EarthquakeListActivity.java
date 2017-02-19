@@ -1,4 +1,4 @@
-package com.pamobo0609;
+package com.pamobo0609.view.activity;
 
 import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
@@ -23,6 +23,7 @@ import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pamobo0609.R;
 import com.pamobo0609.constants.CodeChallengeConstants;
 import com.pamobo0609.databinding.ActivityEarthquakeListBinding;
 import com.pamobo0609.datasource.EarthquakeDataSource;
@@ -30,6 +31,7 @@ import com.pamobo0609.manager.RetrofitManager;
 import com.pamobo0609.model.EarthquakeModel;
 import com.pamobo0609.model.Feature;
 import com.pamobo0609.service.DatabaseService;
+import com.pamobo0609.view.fragment.EarthquakeDetailFragment;
 
 import java.util.Calendar;
 import java.util.List;
